@@ -1,4 +1,5 @@
 ﻿using Exchange.Domain.Entities;
+using Exchange.Persistence;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -11,23 +12,30 @@ namespace Exchange.Infrastructure.Identity
 {
     public sealed class RoleStore : Store<Role>, IRoleStore<Role>
     {
-        public Task<IdentityResult> CreateAsync(Role role, CancellationToken cancellationToken)
+        
+        public RoleStore(ExchangeDbContext context) : base(context)
         {
-            Add(role);
-            return Task.FromResult(IdentityResult.Success);
+            
+        }
+        public async Task<IdentityResult> CreateAsync(Role role, CancellationToken cancellationToken)
+        {
+            _context.Roles.Add(role);
+            await _context.SaveChangesAsync();
+            return await Task.FromResult(IdentityResult.Success);
         }
 
         public Task<IdentityResult> DeleteAsync(Role role, CancellationToken cancellationToken)
         {
-            Delete(role);
+            _context.Roles.Remove(role);
+            _context.SaveChangesAsync();
             return Task.FromResult(IdentityResult.Success);
         }
 
         public Task<Role> FindByIdAsync(string roleId, CancellationToken cancellationToken)
-            => Task.FromResult(Get(roleId));
+            => Task.FromResult(_context.Roles.Where(r=>r.Id==roleId).FirstOrDefault());
 
         public Task<Role> FindByNameAsync(string roleName, CancellationToken cancellationToken)
-            => Task.FromResult(Find(r => string.Equals(r.Name, roleName, StringComparison.OrdinalIgnoreCase)).First());
+            => Task.FromResult(_context.Roles.Where(r => string.Equals(r.Name, roleName, StringComparison.OrdinalIgnoreCase)).First());
 
         public Task<string> GetNormalizedRoleNameAsync(Role role, CancellationToken cancellationToken)
             => Task.FromResult(role.Name);

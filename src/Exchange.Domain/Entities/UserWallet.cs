@@ -6,10 +6,10 @@ namespace Exchange.Domain.Entities
 {
     public class UserWallet
     {
-        public string UserId { get; protected set; }
+        public string UserId { get; set; }
 
-        public virtual User User { get; protected set; }
-        public decimal AmountPLN { get; protected set; }
-        public virtual ICollection<UserWalletCurrency> Currencies { get; protected set; }
+        public virtual User User { get; set; }
+        public decimal AmountPLN { get; set; }
+        public virtual ICollection<UserWalletCurrency> Currencies { get; set; }
     }
 }
